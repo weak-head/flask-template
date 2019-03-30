@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS bid;
 DROP TABLE IF EXISTS stock;
+DROP TABLE IF EXISTS user;
 
 CREATE TABLE stock (
   symbol TEXT PRIMARY KEY,
@@ -17,4 +18,10 @@ CREATE TABLE bid (
   quantity INTEGER NOT NULL,
   note TEXT,
   FOREIGN KEY (stock_id) REFERENCES stock (symbol)
+);
+
+CREATE TABLE user (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL
 );
