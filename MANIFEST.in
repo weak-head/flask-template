@@ -1,0 +1,4 @@
+include fplate/schema.sql
+graft fplate/static
+graft fplate/templates
+global-exclude *.pyc
