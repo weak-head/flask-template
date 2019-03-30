@@ -28,7 +28,7 @@ def create():
     return make_response('Created', 201)
 
 
-@bp.route('/<string:symbol>/update', method=['PATCH'])
+@bp.route('/<string:symbol>/update', methods=['PATCH'])
 @login_required
 def update(symbol):
     rj = request.get_json()
