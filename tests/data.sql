@@ -5,4 +5,5 @@ VALUES
 
 INSERT INTO stock (symbol, company, total_count, price)
 VALUES
-  ('AAB', 'abbybaba', 12, 140);
+  ('AAB', 'abbybaba', 12, 140),
+  ('BBC', 'BbBbCc', 37, 42);

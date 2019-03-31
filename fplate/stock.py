@@ -1,3 +1,5 @@
+import json
+
 from flask import (Blueprint, jsonify, flash, g, request, make_response)
 from werkzeug.exceptions import abort
 
@@ -63,26 +65,29 @@ def delete(symbol):
 @bp.route('/<string:symbol>', methods=['GET'])
 def get(symbol):
     stock = get_stock(symbol)
-    return jsonify(stock)
+    return json.dumps(stock)
 
 
 @bp.route('/', methods=['GET'])
 def get_all():
     db = get_db()
+    cursor = db.cursor()
     query = ('SELECT symbol, company, total_count, price '
              'FROM stock')
-    stocks = db.execute(query).fetchall()
-    return jsonify(stocks)
+    rows = cursor.execute(query).fetchall()
+
+    return json.dumps([dict(ix) for ix in rows])
 
 
 def get_stock(symbol):
     db = get_db()
+    cursor = db.cursor()
     query = ('SELECT symbol, company, total_count, price '
              'FROM stock '
              'WHERE symbol = ?')
-    stock = db.execute(query, (symbol,)).fetchall()
+    stock = cursor.execute(query, (symbol,)).fetchall()
 
     if stock is None:
         abort(404, "Stock {stock} doesn't exist".format(stock=stock))
 
-    return stock
+    return [dict(ix) for ix in stock]
