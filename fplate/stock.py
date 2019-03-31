@@ -55,39 +55,39 @@ def update(symbol):
 @bp.route('/<string:symbol>/delete', methods=['DELETE'])
 @login_required
 def delete(symbol):
-    get_stock(symbol)
+    if get_stock(symbol) is None:
+        return make_response('Not found', 404)
+
     db = get_db()
-    db.execute('DELETE * FROM stock WHERE symbol = ?', [symbol])
+    db.execute('DELETE FROM stock WHERE symbol = ?', (symbol,))
     db.commit()
+
     return make_response('OK', 200)
 
 
 @bp.route('/<string:symbol>', methods=['GET'])
 def get(symbol):
     stock = get_stock(symbol)
-    return json.dumps(stock)
+    return json.dumps(stock) if stock else make_response('Not found', 404)
 
 
 @bp.route('/', methods=['GET'])
 def get_all():
-    db = get_db()
-    cursor = db.cursor()
+    cursor = get_db().cursor()
     query = ('SELECT symbol, company, total_count, price '
              'FROM stock')
     rows = cursor.execute(query).fetchall()
+    cursor.close()
 
     return json.dumps([dict(ix) for ix in rows])
 
 
 def get_stock(symbol):
-    db = get_db()
-    cursor = db.cursor()
+    cursor = get_db().cursor()
     query = ('SELECT symbol, company, total_count, price '
              'FROM stock '
              'WHERE symbol = ?')
-    stock = cursor.execute(query, (symbol,)).fetchall()
+    stock = cursor.execute(query, [symbol]).fetchall()
+    cursor.close()
 
-    if stock is None:
-        abort(404, "Stock {stock} doesn't exist".format(stock=stock))
-
-    return [dict(ix) for ix in stock]
+    return [dict(ix) for ix in stock] if stock else None

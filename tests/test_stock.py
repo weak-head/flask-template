@@ -20,7 +20,7 @@ def test_get_all(client, app):
         assert test_case in stocks
 
 
-def test_get(client, app):
+def test_get_existing(client, app):
     resp = client.get('/stock/AAB')
 
     assert resp.status_code == 200
@@ -31,3 +31,37 @@ def test_get(client, app):
     assert stocks[0]['company'] == 'abbybaba'
     assert stocks[0]['total_count'] == 12
     assert stocks[0]['price'] == 140
+
+
+def test_get_non_existing(client, app):
+    resp = client.get('/stock/DEF')
+    assert resp.status_code == 404
+    assert resp.data == b'Not found'
+
+
+def test_delete_no_auth(client, app, auth):
+    resp = client.delete('/stock/AAB/delete')
+    assert resp.status_code == 401
+    assert resp.data == b'Unauthorized'
+
+
+def test_delete_non_existing(client, app, auth):
+    auth.login()
+    resp = client.delete('/stock/DEF/delete')
+    assert resp.status_code == 404
+    assert resp.data == b'Not found'
+
+
+def test_delete_existing(client, app, auth):
+    auth.login()
+
+    resp = client.get('/stock/AAB')
+    assert resp.status_code == 200
+
+    resp = client.delete('/stock/AAB/delete')
+    assert resp.status_code == 200
+    assert resp.data == b'OK'
+
+    resp = client.get('/stock/AAB')
+    assert resp.status_code == 404
+    assert resp.data == b'Not found'

@@ -86,7 +86,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return make_response('unauthorized', 401)
+            return make_response('Unauthorized', 401)
 
         return view(**kwargs)
 
